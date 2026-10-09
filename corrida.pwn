@@ -23,6 +23,30 @@
 new Float:CPs[MAX_CP][3];
 new TotalCP;
 
+// Substitui floatatan2 (nao existe nessa versao do compilador). Retorna graus.
+stock Float:AtanGraus(Float:z)
+{
+    new Float:a = z;
+    if (a < 0.0) a = -a;
+    new Float:r = 0.785398 * z - z * (a - 1.0) * (0.2447 + 0.0663 * a);
+    return r * 57.29578;
+}
+
+stock Float:Atan2Graus(Float:y, Float:x)
+{
+    new Float:ay = y, Float:ax = x;
+    if (ay < 0.0) ay = -ay;
+    if (ax < 0.0) ax = -ax;
+    if (ax < 0.0001 && ay < 0.0001) return 0.0;
+    if (ay <= ax)
+    {
+        new Float:a = AtanGraus(y / x);
+        if (x < 0.0) a += (y >= 0.0) ? 180.0 : -180.0;
+        return a;
+    }
+    return ((y > 0.0) ? 90.0 : -90.0) - AtanGraus(x / y);
+}
+
 // Carros do menu de corrida (gratis na corrida)
 new ModelosCorrida[8] = {562, 411, 451, 541, 429, 560, 415, 477};
 new ListaCorrida[] = "Elegy\nInfernus\nTurismo\nBullet\nBanshee\nSultan\nCheetah\nZR-350";
@@ -396,7 +420,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (dist < 1.0) dist = 1.0;
             new Float:fx = dx / dist;
             new Float:fy = dy / dist;
-            new Float:ang = floatatan2(-fx, fy, degrees);
+            new Float:ang = Atan2Graus(-fx, fy);
             new Float:atras = float(slot / 2) * 8.0;
             new Float:lado = float(slot % 2) * 4.0 - 2.0;
             new Float:px = CPs[0][0] - fx * atras - fy * lado;
